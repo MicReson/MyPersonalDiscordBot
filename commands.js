@@ -24,6 +24,18 @@ const TEST_COMMAND = {
   type: 1,
 };
 
+const JOKE = {
+  name: "joke",
+  description: "This command would retrive a joke from the joke API",
+  type: 1
+}
+
+const NERD_JOKE = {
+  name: "nerdjoke",
+  description: "Get a nerd joke",
+  type: 1
+}
+
 // create a command -> this is the schema of the commands https://discord.com/developers/docs/interactions/application-commands#slash-commands
 const ELSIMON_COMMAND = {
   name: 'entonces',
@@ -47,6 +59,6 @@ const CHALLENGE_COMMAND = {
   type: 1,
 };
 
-const ALL_COMMANDS = [TEST_COMMAND, CHALLENGE_COMMAND, ELSIMON_COMMAND];
+const ALL_COMMANDS = [TEST_COMMAND, CHALLENGE_COMMAND, ELSIMON_COMMAND, JOKE, NERD_JOKE];
 
 InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS);

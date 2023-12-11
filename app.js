@@ -1,15 +1,19 @@
-import 'dotenv/config';
-import express from 'express';
-import https from 'node:https'
+import "dotenv/config";
+import express from "express";
+import https from "node:https";
 import {
   InteractionType,
   InteractionResponseType,
   InteractionResponseFlags,
   MessageComponentTypes,
   ButtonStyleTypes,
-} from 'discord-interactions';
-import { VerifyDiscordRequest, getRandomEmoji, DiscordRequest } from './utils.js';
-import { getShuffledOptions, getResult } from './game.js';
+} from "discord-interactions";
+import {
+  VerifyDiscordRequest,
+  getRandomEmoji,
+  DiscordRequest,
+} from "./utils.js";
+import { getShuffledOptions, getResult } from "./game.js";
 
 // Create an express app
 const app = express();
@@ -25,23 +29,29 @@ const activeGames = {};
 /**
  * Interactions endpoint URL where Discord will send HTTP requests
  */
-app.post('/interactions', async function (req, res) {
+app.post("/interactions", async function (req, res) {
   // Interaction type and data
   const { type, id, data } = req.body;
-  
-  const jokeURL = 'https://v2.jokeapi.dev/joke/Any';
-
-  // https.get(jokeURL, (res)=>{
-
-  //   res.on()
-
-  // })
-
   /**
    * Handle verification requests
    */
   if (type === InteractionType.PING) {
     return res.send({ type: InteractionResponseType.PONG });
+  }
+
+  function GetJoke(joke_url) {
+    https.get(joke_url, (response) => {
+      response.on("data", (data) => {
+        const jokeData = JSON.parse(data);
+        const TheJoke = jokeData.joke;
+        res.send({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+            content: TheJoke,
+          },
+        });
+      });
+    });
   }
 
   /**
@@ -52,36 +62,42 @@ app.post('/interactions', async function (req, res) {
     const { name } = data;
 
     // "test" command
-    if (name === 'test') {
+    if (name === "test") {
       // Send a message into the channel where command was triggered from
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           // Fetches a random emoji to send from a helper function
-          content: 'Ya Simon ' + getRandomEmoji(),
+          content: "Ya Simon " + getRandomEmoji(),
         },
       });
     }
 
     // by using the schemas of the commands you can get the name of the commands and decide what to do with it
-    if (name === 'entonces') {
+    if (name === "entonces") {
       // Send a message into the channel where command was triggered from
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           // Fetches a random emoji to send from a helper function
-          content: 'Que tiro? ',
+          content: "Que tiro? ",
         },
       });
     }
 
     // command to tell jokes
-      // if (name === 'Cuenta un chiste'){
+    if (name === "joke") {
+      const jokeURL = "https://v2.jokeapi.dev/joke/Any?type=single";
+      GetJoke(jokeURL);
+    }
 
-      // }
+    if (name === "nerdjoke") {
+      const nerdJokeURL = "https://v2.jokeapi.dev/joke/Programming?type=single";
+      GetJoke(nerdJokeURL);
+    }
   }
 });
 
 app.listen(PORT, () => {
-  console.log('Listening on port', PORT);
+  console.log("Listening on port", PORT);
 });
